@@ -6,7 +6,7 @@ This is code for a very simple Arduino Nano based Canon DSLR Intervalometer I ma
 
 The device has four buttons on the front of the device which server as its sole inputs. When switched on, the display shows an hrs:mins:secs display on the left half of the screen, indicating the amount of time be wait between shutters, and the number of shots to take on the right, which take on their defaults of 0:0:0 and the max value of an unsigned short int (i.e. "unlimited"). Two of the buttons are used to increment the selected value either up or down respectively, one used to toggle between which number to increment, and one used to start the time lapse.
 
-Once the time lapse mode has been activated, the device counts down the number of seconds until the next photo is taken. The toggle button can be used to toggle the screen and backlight on and off to save battery during operation.
+Once the time lapse mode has been activated, the device counts down the number of seconds until the next photo is taken and displays the number of completed shots/the number to be taken. The toggle button can be used to toggle the screen and backlight on and off to save battery during operation.
 
 ## Part List
 
