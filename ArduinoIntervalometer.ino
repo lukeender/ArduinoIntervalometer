@@ -1,21 +1,21 @@
-// include the library code:
 #include <LiquidCrystal.h>
 #define SRTBTTN_PIN A0
 #define UPBTTN_PIN A3
 #define DWNBTTN_PIN A2
 #define SELBTTN_PIN A1
 #define TRANS_PIN 2
+#define BKLGHT_PIN 3
 
-// initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(12, 10, 5, 4, 7, 6);
 int timeIndicie = 0;
-unsigned short int time_[4] = {0,0,0,150}; // stores seconds, minutes, hours, number of photos
-bool backlight_ = true;
+unsigned short int time_[4] = {0,0,0,-1}; // stores seconds, minutes, hours, between photos; number of photos
+bool screen = true;
 
-void timelapsemode(int,int);
+void timelapseLoop(unsigned short int,unsigned short int);
 void readA();
 void takephoto();
 void updateMenu();
+void toggleScreen();
 
 void setup() {
   lcd.begin(8, 2);
@@ -26,15 +26,17 @@ void setup() {
   pinMode(SELBTTN_PIN,INPUT);
   pinMode(TRANS_PIN,OUTPUT);
   digitalWrite(TRANS_PIN,LOW);
-  lcd.noBacklight();
+  digitalWrite(BKLGHT_PIN,HIGH);
 }
 
 void loop() {
   if (digitalRead(SRTBTTN_PIN) == HIGH){
+    while(digitalRead(SRTBTTN_PIN) == HIGH)
+      
     lcd.clear();
-    timelapsemode((time_[2]*60*60 + time_[1]*60 + time_[0]),time_[3]);
+    timelapseLoop((time_[2]*60*60 + time_[1]*60 + time_[0]),time_[3]); //convert hours, minutes to seconds and send to the main 
   }
-  else if (digitalRead(SELBTTN_PIN) == HIGH){
+  else if (digitalRead(SELBTTN_PIN) == HIGH){ //if select button pushed, change in the indicie of array to access
     if (timeIndicie < 3)
       timeIndicie++;
     else if(timeIndicie == 3)
@@ -45,13 +47,9 @@ void loop() {
   else if ((digitalRead(DWNBTTN_PIN) == HIGH) && (time_[timeIndicie] > 0))
     time_[timeIndicie]--;
   updateMenu();
- // readA();
-  
- // if (analogRead(A2) < 100)
-   // takephoto();
 }
 
-void updateMenu(){
+void updateMenu(){ //this function updates the 
   lcd.print(time_[2]);
   lcd.print(":");
   lcd.print(time_[1]);
@@ -65,26 +63,8 @@ void updateMenu(){
   delay(100);
 }
 
-/*void readA(){
-  raw1 = analogRead(A0) + 1;
-  raw2 = analogRead(A1) + 1;
-  secs = (raw1 % 120)/2;
-  hrs = (raw1 / 7200);
-  mins = (raw1 / 120 - hrs*60);
-  lcd.print((int)hrs);
-  lcd.print(":");
-  lcd.print(mins);
-  lcd.print(":");
-  lcd.print((int)secs);
-  lcd.print(" ");
-  lcd.setCursor(0,1);
-  lcd.print(raw2);
-  lcd.print(" ");
-  lcd.home();
-  delay(100);
-}*/
 
-void timelapsemode(int interval, int photos){
+void timelapseLoop(unsigned short int interval, unsigned short int photos){
   int counter = 1;
   unsigned long int tbegin = millis();
   while(counter <= photos){
@@ -93,7 +73,10 @@ void timelapsemode(int interval, int photos){
       lcd.print((interval - (millis()/1000 - tbegin/1000)));
       lcd.print(" ");
       lcd.home();
-      delay(100);
+      if (digitalRead(SRTBTTN_PIN) == HIGH){
+        toggleScreen();
+      }
+      delay(50);
     }
     takephoto();
     counter++;
@@ -111,6 +94,21 @@ void takephoto(){
   digitalWrite(TRANS_PIN,HIGH);
   delay(50);
   digitalWrite(TRANS_PIN,LOW);
+}
+
+void toggleScreen(){
+  while(digitalRead(SRTBTTN_PIN) == HIGH){
+          //stall infinitely while putton depressed (eliminates accidental double presses)
+        }
+        screen = !screen;
+        if (screen){
+          lcd.display();
+          digitalWrite(BKLGHT_PIN,HIGH);
+        }
+        else{
+          lcd.noDisplay();
+          digitalWrite(BKLGHT_PIN,LOW);
+        }
 }
 
 
