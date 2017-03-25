@@ -7,12 +7,11 @@
 #define BKLGHT_PIN 3
 
 LiquidCrystal lcd(12, 10, 5, 4, 7, 6);
-int timeIndicie = 0;
+int timeIndicie = 0; //used in loop to decide which element of the direcly below to edit
 unsigned short int time_[4] = {0,0,0,-1}; // stores seconds, minutes, hours, between photos; number of photos
-bool screen = true;
+bool screenOn = true;
 
 void timelapseLoop(unsigned short int,unsigned short int);
-void readA();
 void takephoto();
 void updateMenu();
 void toggleScreen();
@@ -58,7 +57,7 @@ void updateMenu(){ //this function updates the
   lcd.print(" ");
   lcd.setCursor(0,1);
   lcd.print(time_[3]);
-  lcd.print(" ");
+  lcd.print("     ");
   lcd.home();
   delay(100);
 }
@@ -100,8 +99,8 @@ void toggleScreen(){
   while(digitalRead(SRTBTTN_PIN) == HIGH){
           //stall infinitely while putton depressed (eliminates accidental double presses)
         }
-        screen = !screen;
-        if (screen){
+        screenOn = !screenOn;
+        if (screenOn){
           lcd.display();
           digitalWrite(BKLGHT_PIN,HIGH);
         }
